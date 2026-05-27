@@ -34,11 +34,11 @@ public class FileProcessingWorker {
         List<Message> messages = sqsService.receiveMessages(5);
 
         if (messages.isEmpty()) {
-            log.debug("Nenhuma mensagem na fila");
+            log.debug("No messages in queue");
             return;
         }
 
-        log.info("Recebidas {} mensagens da fila", messages.size());
+        log.info("Received {} queues messages", messages.size());
 
         for (Message message : messages) {
             processMessage(message);
@@ -49,25 +49,23 @@ public class FileProcessingWorker {
         FileProcessingMessage payload = null;
         try {
             payload = objectMapper.readValue(message.body(), FileProcessingMessage.class);
-            log.info("Processando fileId={}", payload.getFileId());
+            log.info("Processing fileId={}", payload.getFileId());
 
             FileRecord record = repository.findById(payload.getFileId())
-                    .orElseThrow(() -> new RuntimeException("FileRecord não encontrado"));
+                    .orElseThrow(() -> new RuntimeException("FileRecord not found"));
 
-            // PROCESSING
             updateStatus(record, FileStatus.PROCESSING, payload.getFileName(), null);
 
             processFile(record, payload);
 
-            // DONE
             updateStatus(record, FileStatus.DONE, payload.getFileName(), null);
 
             sqsService.deleteMessage(message.receiptHandle());
-            log.info("FileId={} processado com sucesso", payload.getFileId());
+            log.info("FileId={} processed successfully", payload.getFileId());
 
         } catch (Exception e) {
-            log.error("Erro ao processar — fileId={}: {}",
-                    payload != null ? payload.getFileId() : "desconhecido", e.getMessage(), e);
+            log.error("Error process — fileId={}: {}",
+                    payload != null ? payload.getFileId() : "unknown", e.getMessage(), e);
 
             if (payload != null) {
                 final String fileId = payload.getFileId();
@@ -82,12 +80,10 @@ public class FileProcessingWorker {
     }
 
     private void updateStatus(FileRecord record, FileStatus status, String fileName, String errorMessage) {
-        // Atualiza Postgres
         record.setStatus(status);
         record.setErrorMessage(errorMessage);
         repository.save(record);
 
-        // Registra evento no DynamoDB
         dynamoDbService.saveStatus(ProcessingStatus.builder()
                 .fileId(record.getId())
                 .status(status.name())
@@ -103,11 +99,7 @@ public class FileProcessingWorker {
     }
 
     private void processFile(FileRecord record, FileProcessingMessage payload) {
-        // Por enquanto só simula o processamento
-        // Na Etapa 4 vamos integrar com DynamoDB para rastrear o status aqui
-        log.info("Processando arquivo '{}' do tipo '{}'", payload.getFileName(), payload.getContentType());
-
-        // Simula tempo de processamento
+        log.info("Process file... '{}' type '{}'", payload.getFileName(), payload.getContentType());
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
