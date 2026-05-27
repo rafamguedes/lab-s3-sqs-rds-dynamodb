@@ -31,7 +31,7 @@ public class S3Service {
 
         s3Client.putObject(request, RequestBody.fromInputStream(inputStream, contentLength));
 
-        log.info("Arquivo '{}' enviado para S3 bucket '{}'", key, bucket);
+        log.info("Send '{}' arquive to S3 bucket '{}'", key, bucket);
     }
 
     public InputStream downloadFile(String key) {
@@ -45,6 +45,6 @@ public class S3Service {
                 .bucket(bucket)
                 .key(key)
                 .build());
-        log.info("Arquivo '{}' removido do S3", key);
+        log.info("Arquive '{}' removed on S3", key);
     }
 }

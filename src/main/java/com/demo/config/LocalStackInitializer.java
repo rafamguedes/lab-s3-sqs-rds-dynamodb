@@ -38,10 +38,10 @@ public class LocalStackInitializer implements ApplicationRunner {
         String bucket = props.getS3().getBucketName();
         try {
             s3Client.headBucket(r -> r.bucket(bucket));
-            log.info("S3 bucket '{}' já existe", bucket);
+            log.info("S3 bucket '{}' already exists", bucket);
         } catch (NoSuchBucketException e) {
             s3Client.createBucket(r -> r.bucket(bucket));
-            log.info("S3 bucket '{}' criado", bucket);
+            log.info("S3 bucket '{}' created", bucket);
         }
     }
 
@@ -49,9 +49,9 @@ public class LocalStackInitializer implements ApplicationRunner {
         String queue = props.getSqs().getQueueName();
         try {
             sqsClient.createQueue(r -> r.queueName(queue));
-            log.info("SQS queue '{}' criada", queue);
+            log.info("SQS queue '{}' created", queue);
         } catch (QueueNameExistsException e) {
-            log.info("SQS queue '{}' já existe", queue);
+            log.info("SQS queue '{}' already exists", queue);
         }
     }
 
@@ -59,7 +59,7 @@ public class LocalStackInitializer implements ApplicationRunner {
         String table = props.getDynamodb().getTableName();
         try {
             dynamoDbClient.describeTable(r -> r.tableName(table));
-            log.info("DynamoDB table '{}' já existe", table);
+            log.info("DynamoDB table '{}' already exists", table);
         } catch (ResourceNotFoundException e) {
             dynamoDbClient.createTable(r -> r
                     .tableName(table)
@@ -73,13 +73,13 @@ public class LocalStackInitializer implements ApplicationRunner {
                             .build())
                     .billingMode(BillingMode.PAY_PER_REQUEST)
             );
-            log.info("DynamoDB table '{}' criada", table);
+            log.info("DynamoDB table '{}' created", table);
         }
     }
 
     private void verifySesEmail() {
         String email = props.getSes().getFromEmail();
         sesClient.verifyEmailIdentity(r -> r.emailAddress(email));
-        log.info("SES email '{}' verificado", email);
+        log.info("SES email '{}' checking", email);
     }
 }

@@ -41,7 +41,6 @@ public class FileService {
         try {
             s3Service.uploadFile(s3Key, file.getInputStream(), file.getSize(), file.getContentType());
 
-            // Publish to the SQS queue after successful upload
             sqsService.sendMessage(FileProcessingMessage.builder()
                     .fileId(record.getId())
                     .s3Key(s3Key)

@@ -16,13 +16,13 @@ public class SesService {
     private final AwsProperties props;
 
     public void sendSuccessEmail(String fileName, String fileId) {
-        String subject = "Arquivo processado com sucesso";
+        String subject = "File processed successfully";
         String body = buildSuccessBody(fileName, fileId);
         send(subject, body);
     }
 
     public void sendErrorEmail(String fileName, String fileId, String errorMessage) {
-        String subject = "Erro ao processar arquivo";
+        String subject = "Error processing file";
         String body = buildErrorBody(fileName, fileId, errorMessage);
         send(subject, body);
     }
@@ -44,10 +44,9 @@ public class SesService {
 
         try {
             SendEmailResponse response = sesClient.sendEmail(request);
-            log.info("E-mail enviado via SES — messageId={}", response.messageId());
+            log.info("E-mail sent via SES — messageId={}", response.messageId());
         } catch (Exception e) {
-            // Loga mas não deixa o erro de e-mail quebrar o fluxo principal
-            log.error("Falha ao enviar e-mail SES: {}", e.getMessage());
+            log.error("Failed to sent e-mail SES: {}", e.getMessage());
         }
     }
 

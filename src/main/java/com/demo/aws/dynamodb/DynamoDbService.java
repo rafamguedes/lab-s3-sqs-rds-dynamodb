@@ -39,7 +39,7 @@ public class DynamoDbService {
         }
 
         dynamoDbClient.putItem(r -> r.tableName(table).item(item));
-        log.info("Status salvo no DynamoDB — fileId={}, status={}", status.getFileId(), status.getStatus());
+        log.info("Status saved on DynamoDB — fileId={}, status={}", status.getFileId(), status.getStatus());
     }
 
     public ProcessingStatus findByFileId(String fileId) {
